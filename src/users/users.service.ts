@@ -36,4 +36,21 @@ export class UsersService {
       },
     });
   }
+
+  async findAll(): Promise<User[]> {
+    return this.prisma.user.findMany();
+  }
+
+  async findOne(id: number): Promise<User> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    } else {
+      return user;
+    }
+  }
 }
