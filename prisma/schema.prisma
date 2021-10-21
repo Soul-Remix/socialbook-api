@@ -46,6 +46,13 @@ model FriendsList {
   @@map("friends_lists")
 }
 
+model FriendRequests {
+  id       Int     @id @default(autoincrement())
+  sender   Int
+  receiver Int
+  accepted Boolean @default(false)
+}
+
 model Post {
   id        Int       @id @default(autoincrement())
   createdAt DateTime  @default(now())
