@@ -47,4 +47,9 @@ export class UsersController {
   findFriends(@Param('id') id: string) {
     return this.usersService.findFriends(+id);
   }
+
+  @Post('search')
+  searchUsers(@Body() search: SearchUsersDto) {
+    return this.usersService.searchUsers(search.search);
+  }
 }

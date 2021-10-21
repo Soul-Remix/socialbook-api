@@ -136,4 +136,31 @@ export class UsersService {
       },
     });
   }
+
+  async searchUsers(search) {
+    return this.prisma.user.findMany({
+      where: {
+        OR: [
+          {
+            firstName: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            lastName: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        profilePicture: true,
+      },
+    });
+  }
 }
