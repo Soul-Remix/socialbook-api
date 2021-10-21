@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { User, Prisma } from '@prisma/client';
+import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 import { PrismaService } from 'src/prisma.service';
@@ -52,5 +52,44 @@ export class UsersService {
     } else {
       return user;
     }
+  }
+
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    if (updateUserDto.password) {
+      const hash = await bcrypt.hash(updateUserDto.password, 12);
+      updateUserDto.password = hash;
+    }
+    return this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        ...updateUserDto,
+      },
+    });
+  }
+
+  remove(id: number): Promise<User> {
+    const user = this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    return this.prisma.user.delete({
+      where: {
+        id,
+      },
+    });
   }
 }
