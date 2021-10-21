@@ -51,6 +51,9 @@ model FriendRequests {
   sender   Int
   receiver Int
   accepted Boolean @default(false)
+
+  @@unique([sender, receiver])
+  @@map("friend_requests")
 }
 
 model Post {

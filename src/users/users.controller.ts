@@ -48,6 +48,11 @@ export class UsersController {
     return this.usersService.findFriends(+id);
   }
 
+  @Post('friends')
+  sendFriendRequest(@Body() request: FriendRequestDto) {
+    return this.usersService.sendFriendRequest(request);
+  }
+
   @Post('search')
   searchUsers(@Body() search: SearchUsersDto) {
     return this.usersService.searchUsers(search.search);

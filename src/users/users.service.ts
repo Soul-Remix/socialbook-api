@@ -119,9 +119,9 @@ export class UsersService {
     });
   }
 
-  remove(id: number): Promise<User> {
+  async remove(id: number): Promise<User> {
     // search for a user with the same id
-    const user = this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         id,
       },
@@ -130,6 +130,18 @@ export class UsersService {
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
+    await this.prisma.friendRequests.deleteMany({
+      where: {
+        OR: [
+          {
+            sender: id,
+          },
+          {
+            receiver: id,
+          },
+        ],
+      },
+    });
     return this.prisma.user.delete({
       where: {
         id,
@@ -160,6 +172,25 @@ export class UsersService {
         firstName: true,
         lastName: true,
         profilePicture: true,
+      },
+    });
+  }
+
+  async sendFriendRequest({ sender, receiver }) {
+    // search for a user with the same id
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: receiver,
+      },
+    });
+    // throw error if a user was found
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    return this.prisma.friendRequests.create({
+      data: {
+        sender,
+        receiver,
       },
     });
   }
