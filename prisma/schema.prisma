@@ -1,0 +1,93 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              Int              @id @default(autoincrement())
+  email           String           @unique
+  firstName       String           @db.VarChar(30)
+  lastName        String           @db.VarChar(30)
+  profilePicture  String           @default("/image")
+  password        String
+  extendedProfile ExtendedProfile?
+  posts           Post[]
+  comments        Comment[]
+  conversation    Conversation[]
+  friends         FriendsList?
+
+  @@map("users")
+}
+
+model ExtendedProfile {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  bio       String?
+  country   String?
+  city      String?
+  birthDate String?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int      @unique
+
+  @@map("extended_profiles")
+}
+
+model FriendsList {
+  id      Int   @id @default(autoincrement())
+  friends Int[]
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  Int   @unique
+
+  @@map("friends_lists")
+}
+
+model Post {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  content   String    @db.VarChar(255)
+  image     String?
+  Likes     Int[]
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  Int
+  comments  Comment[]
+
+  @@map("posts")
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  content   String   @db.VarChar(255)
+  Post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+
+  @@map("comments")
+}
+
+model Conversation {
+  id       Int       @id @default(autoincrement())
+  members  User[]
+  messages Message[]
+
+  @@map("conversations")
+}
+
+model Message {
+  id             Int           @id @default(autoincrement())
+  text           String        @db.VarChar(255)
+  senderId       Int
+  reciverId      Int
+  Conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversationId Int?
+
+  @@map("messages")
+}
