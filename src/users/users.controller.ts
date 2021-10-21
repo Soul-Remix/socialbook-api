@@ -63,7 +63,12 @@ export class UsersController {
 
   // Accept A friend request
   @Patch('friends/:id')
-  acceptFriendRequest(@Param('id', ParseIntPipe) id: number) {
+  acceptFriendRequest(@Param('id') id: string) {
+    return this.usersService.acceptFriendRequest(+id);
+  }
+
+  @Delete('friends/:id')
+  declineFriendRequest(@Param('id') id: string) {
     return this.usersService.acceptFriendRequest(+id);
   }
 
