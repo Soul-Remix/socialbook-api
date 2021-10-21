@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { User, FriendsList } from '@prisma/client';
+import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 import { PrismaService } from 'src/prisma.service';
@@ -76,6 +76,9 @@ export class UsersService {
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
+    if (!user.friends) {
+      return [];
+    }
     // return the friends list
     return this.prisma.user.findMany({
       where: {
@@ -130,6 +133,7 @@ export class UsersService {
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
+    // delete any friends requests sent or received by the user
     await this.prisma.friendRequests.deleteMany({
       where: {
         OR: [
@@ -142,6 +146,7 @@ export class UsersService {
         ],
       },
     });
+    // delete the user
     return this.prisma.user.delete({
       where: {
         id,
@@ -149,7 +154,8 @@ export class UsersService {
     });
   }
 
-  async searchUsers(search) {
+  async searchUsers(search: string) {
+    // search for users that contain the search string in first name or last name
     return this.prisma.user.findMany({
       where: {
         OR: [
@@ -176,7 +182,8 @@ export class UsersService {
     });
   }
 
-  async sendFriendRequest({ sender, receiver }) {
+  async sendFriendRequest(request: { sender: number; receiver: number }) {
+    const { sender, receiver } = request;
     // search for a user with the same id
     const user = await this.prisma.user.findUnique({
       where: {
@@ -187,11 +194,59 @@ export class UsersService {
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
+    // send the friend request
     return this.prisma.friendRequests.create({
       data: {
         sender,
         receiver,
       },
     });
+  }
+
+  async acceptFriendRequest(id: number) {
+    const request = await this.prisma.friendRequests.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!request) {
+      throw new HttpException('Request not found', HttpStatus.NOT_FOUND);
+    }
+
+    const [conversation, sender, recevier, accept] = await Promise.all([
+      this.prisma.conversation.create({
+        data: {
+          members: {
+            connect: [{ id: request.receiver }, { id: request.sender }],
+          },
+        },
+      }),
+      this.prisma.friendsList.update({
+        where: {
+          userId: request.sender,
+        },
+        data: {
+          friends: {
+            push: request.receiver,
+          },
+        },
+      }),
+      this.prisma.friendsList.update({
+        where: {
+          userId: request.receiver,
+        },
+        data: {
+          friends: {
+            push: request.sender,
+          },
+        },
+      }),
+      this.prisma.friendRequests.delete({
+        where: {
+          id,
+        },
+      }),
+    ]);
+    return accept;
   }
 }
