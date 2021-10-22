@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 
 import { PrismaService } from 'src/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
@@ -55,6 +56,7 @@ export class UsersService {
       where: {
         id,
       },
+      include: { extendedProfile: true },
     });
     // throw error if a user was not found
     if (!user) {
@@ -87,6 +89,27 @@ export class UsersService {
       },
       data: {
         ...updateUserDto,
+      },
+    });
+  }
+
+  async updateProfile(id: number, data: UpdateProfileDto) {
+    // search for a profile with the same id
+    const profile = await this.prisma.extendedProfile.findUnique({
+      where: {
+        id,
+      },
+    });
+    // throw error if a profile was not found
+    if (!profile) {
+      throw new HttpException('Profile not found', HttpStatus.NOT_FOUND);
+    }
+    return this.prisma.extendedProfile.update({
+      where: {
+        id,
+      },
+      data: {
+        ...data,
       },
     });
   }

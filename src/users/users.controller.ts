@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  ParseIntPipe,
 } from '@nestjs/common';
 
 import { UsersService } from './users.service';
@@ -14,6 +13,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { SearchUsersDto } from './dto/search-user.dto';
 import { FriendRequestDto } from './dto/friend-request.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Controller('users')
 export class UsersController {
@@ -41,6 +41,15 @@ export class UsersController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
+  }
+
+  // Update a user profile
+  @Patch(':id/profile')
+  updateProfile(
+    @Param('id') id: string,
+    @Body() UpdateProfileDto: UpdateProfileDto,
+  ) {
+    return this.usersService.updateProfile(+id, UpdateProfileDto);
   }
 
   // Delete a user
