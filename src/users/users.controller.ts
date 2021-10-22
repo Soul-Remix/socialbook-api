@@ -12,7 +12,6 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { SearchUsersDto } from './dto/search-user.dto';
-import { FriendRequestDto } from './dto/friend-request.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Controller('users')
@@ -56,29 +55,6 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
-  }
-
-  // Return a list off all the user friends
-  @Get(':id/friends')
-  findFriends(@Param('id') id: string) {
-    return this.usersService.findFriends(+id);
-  }
-
-  // Send a friend request
-  @Post('friends')
-  sendFriendRequest(@Body() request: FriendRequestDto) {
-    return this.usersService.sendFriendRequest(request);
-  }
-
-  // Accept A friend request
-  @Patch('friends/:id')
-  acceptFriendRequest(@Param('id') id: string) {
-    return this.usersService.acceptFriendRequest(+id);
-  }
-
-  @Delete('friends/:id')
-  declineFriendRequest(@Param('id') id: string) {
-    return this.usersService.acceptFriendRequest(+id);
   }
 
   // Search for a user

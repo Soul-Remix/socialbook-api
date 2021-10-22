@@ -48,9 +48,10 @@ model FriendsList {
 }
 
 model FriendRequests {
-  id       Int @id @default(autoincrement())
+  id       Int     @id @default(autoincrement())
   sender   Int
   receiver Int
+  accepted Boolean @default(false)
 
   @@unique([sender, receiver])
   @@map("friend_requests")
