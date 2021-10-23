@@ -15,6 +15,7 @@ import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { SearchPostsDto } from './dto/search-posts.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -49,7 +50,7 @@ export class PostsController {
     return this.postsService.findAll(cursor);
   }
 
-  // Get Users Posts
+  // Get User Posts
   @Get('personal')
   @UseGuards(JwtAuthGuard)
   findPersonal(@Request() req: any) {
@@ -65,6 +66,14 @@ export class PostsController {
       cursor = +cursor;
     }
     return this.postsService.findFeed(req.user.id, cursor);
+  }
+
+  // Search Posts
+  @Post('search')
+  @UseGuards(JwtAuthGuard)
+  search(@Body('search') search: SearchPostsDto) {
+    console.log(search);
+    return this.postsService.search(search);
   }
 
   // Find One Post

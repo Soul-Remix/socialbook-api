@@ -152,6 +152,18 @@ export class PostsService {
     return { posts, nextCursor, hasNextPage };
   }
 
+  // Search Posts
+  async search(text: any): Promise<Post[]> {
+    return this.prisma.post.findMany({
+      where: {
+        content: {
+          contains: text,
+          mode: 'insensitive',
+        },
+      },
+    });
+  }
+
   // Helper Func to check if there's a post with the provided id
   async CheckPostID(id: number) {
     const post = this.prisma.post.findUnique({
