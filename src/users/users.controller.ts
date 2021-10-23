@@ -52,6 +52,7 @@ export class UsersController {
   }
 
   // Delete a user
+  // needs to be updated to remove the deleted user id from other users friends list
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);

@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -67,17 +67,8 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    // search for a user with the same id
-    const user = await this.prisma.user.findUnique({
-      where: {
-        id,
-      },
-    });
-    // throw error if a user was not found
-    if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-    }
-    // hash the password if changed
+    // search if there's a user with this id
+    await this.validUser(id);
     if (updateUserDto.password) {
       const hash = await bcrypt.hash(updateUserDto.password, 12);
       updateUserDto.password = hash;
@@ -115,16 +106,8 @@ export class UsersService {
   }
 
   async remove(id: number): Promise<User> {
-    // search for a user with the same id
-    const user = await this.prisma.user.findUnique({
-      where: {
-        id,
-      },
-    });
-    // throw error if a user was not found
-    if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-    }
+    // search if there's a user with this id
+    await this.validUser(id);
     // delete any friends requests sent or received by the user
     await this.prisma.friendRequests.deleteMany({
       where: {
@@ -172,5 +155,19 @@ export class UsersService {
         profilePicture: true,
       },
     });
+  }
+
+  async validUser(id: number) {
+    // search for a user with the same id
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
+    // throw error if a user was not found
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    return user;
   }
 }

@@ -1,6 +1,6 @@
 import { FriendRequests } from '.prisma/client';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class FriendsService {
