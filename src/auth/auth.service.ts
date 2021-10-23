@@ -16,7 +16,6 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { email },
     });
-    console.log(user);
     if (!user) {
       throw new HttpException(
         'Wrong Credentials provided',
@@ -37,6 +36,7 @@ export class AuthService {
     const payload = { sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
+      user: user,
     };
   }
 }
