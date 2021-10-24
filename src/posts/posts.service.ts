@@ -45,7 +45,8 @@ export class PostsService {
 
   // find a post by id
   async findOne(id: number) {
-    await this.CheckPostID(id);
+    const post = await this.CheckPostID(id);
+    return post;
   }
 
   // Get Personal Posts
@@ -53,6 +54,9 @@ export class PostsService {
     return this.prisma.post.findMany({
       where: {
         authorId: id,
+      },
+      include: {
+        comments: true,
       },
     });
   }
@@ -69,6 +73,9 @@ export class PostsService {
         orderBy: {
           createdAt: 'desc',
         },
+        include: {
+          comments: true,
+        },
       });
       // If cursor is Defined
     } else {
@@ -80,6 +87,9 @@ export class PostsService {
         },
         orderBy: {
           createdAt: 'desc',
+        },
+        include: {
+          comments: true,
         },
       });
     }
@@ -120,6 +130,9 @@ export class PostsService {
         orderBy: {
           createdAt: 'desc',
         },
+        include: {
+          comments: true,
+        },
       });
     } else {
       posts = await this.prisma.post.findMany({
@@ -143,6 +156,9 @@ export class PostsService {
         orderBy: {
           createdAt: 'desc',
         },
+        include: {
+          comments: true,
+        },
       });
     }
     if (posts && posts.length === 10) {
@@ -161,14 +177,20 @@ export class PostsService {
           mode: 'insensitive',
         },
       },
+      include: {
+        comments: true,
+      },
     });
   }
 
   // Helper Func to check if there's a post with the provided id
   async CheckPostID(id: number) {
-    const post = this.prisma.post.findUnique({
+    const post = await this.prisma.post.findUnique({
       where: {
         id,
+      },
+      include: {
+        comments: true,
       },
     });
     if (!post) {

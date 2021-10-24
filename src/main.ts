@@ -7,6 +7,7 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       skipUndefinedProperties: true,
+      whitelist: true,
     }),
   );
   app.enableVersioning();
