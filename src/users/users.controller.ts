@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 
 import { UsersService } from './users.service';
@@ -30,8 +31,11 @@ export class UsersController {
   // Return a list of all users
   @Get()
   @UseGuards(JwtAuthGuard)
-  findAll() {
-    return this.usersService.findAll();
+  findAll(@Query('cursor') cursor?: number) {
+    if (typeof cursor === 'string' && typeof cursor !== undefined) {
+      cursor = +cursor;
+    }
+    return this.usersService.findAll(cursor);
   }
 
   // Find a user by id

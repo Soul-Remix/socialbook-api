@@ -11,7 +11,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto) {
     const { firstName, lastName, email, password } = createUserDto;
     // search for a user with the same email
     const foundUser = await this.prisma.user.findUnique({
@@ -29,7 +29,7 @@ export class UsersService {
     //hash the password
     const hash = await bcrypt.hash(password, 12);
     //create the user
-    return this.prisma.user.create({
+    const createdUser = await this.prisma.user.create({
       data: {
         firstName,
         lastName,
@@ -43,14 +43,48 @@ export class UsersService {
         },
       },
     });
+    return { message: 'User Created Successfully', id: createdUser.id };
   }
 
-  async findAll(): Promise<User[]> {
+  async findAll(cursor: number | undefined) {
     // return a list with all the users
-    return this.prisma.user.findMany();
+    let nextCursor: number | undefined;
+    let hasNextPage = false;
+    let users;
+    // If cursor is not defined
+    if (cursor === undefined) {
+      users = await this.prisma.user.findMany({
+        take: 20,
+        orderBy: {
+          extendedProfile: {
+            createdAt: 'desc',
+          },
+        },
+      });
+      // If cursor is Defined
+    } else {
+      users = await this.prisma.user.findMany({
+        take: 20,
+        skip: 1,
+        cursor: {
+          id: cursor,
+        },
+        orderBy: {
+          extendedProfile: {
+            createdAt: 'desc',
+          },
+        },
+      });
+    }
+    // Check if there's more users
+    if (users && users.length === 20) {
+      nextCursor = users[19].id;
+      hasNextPage = true;
+    }
+    return { users, hasNextPage, nextCursor };
   }
 
-  async findOne(id: number): Promise<User> {
+  async findOne(id: number) {
     // search for a user with the same id
     const user = await this.prisma.user.findUnique({
       where: {
@@ -63,7 +97,8 @@ export class UsersService {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
     // return the user
-    return user;
+    const { password, ...result } = user;
+    return result;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
@@ -74,7 +109,7 @@ export class UsersService {
       updateUserDto.password = hash;
     }
     // update the user
-    return this.prisma.user.update({
+    const user = await this.prisma.user.update({
       where: {
         id,
       },
@@ -82,6 +117,8 @@ export class UsersService {
         ...updateUserDto,
       },
     });
+    const { password, ...result } = user;
+    return result;
   }
 
   async updateProfile(id: number, data: UpdateProfileDto) {
@@ -105,7 +142,7 @@ export class UsersService {
     });
   }
 
-  async remove(id: number): Promise<User> {
+  async remove(id: number) {
     // search if there's a user with this id
     await this.validUser(id);
     // delete any friends requests sent or received by the user
@@ -122,11 +159,12 @@ export class UsersService {
       },
     });
     // delete the user
-    return this.prisma.user.delete({
+    await this.prisma.user.delete({
       where: {
         id,
       },
     });
+    return { message: 'User Deleted Successfully' };
   }
 
   async searchUsers(search: string) {
