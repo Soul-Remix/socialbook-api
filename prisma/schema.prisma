@@ -96,7 +96,7 @@ model Message {
   id             Int           @id @default(autoincrement())
   text           String        @db.VarChar(255)
   senderId       Int
-  reciverId      Int
+  receiverId     Int
   Conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   conversationId Int?
 

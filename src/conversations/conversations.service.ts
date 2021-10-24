@@ -1,0 +1,42 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma.service';
+import { CreateMessageDto } from './dto/create-message.dto';
+
+@Injectable()
+export class ConversationsService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  // Create Message
+  async create(createMessageDto: CreateMessageDto, senderId: number) {
+    const data = { ...createMessageDto };
+    return this.prisma.message.create({
+      data: {
+        text: data.text,
+        senderId,
+        receiverId: data.receiverId,
+        Conversation: { connect: { id: data.conversationId } },
+      },
+    });
+  }
+
+  // Get User Conversations
+  async findAllUserConversation(id: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: {
+        conversation: {
+          include: {
+            members: {
+              select: { id: true },
+            },
+          },
+        },
+      },
+    });
+    if (!user) {
+      throw new NotFoundException();
+    }
+    const conversation = user.conversation;
+    return { conv: conversation };
+  }
+}
