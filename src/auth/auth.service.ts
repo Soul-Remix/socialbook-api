@@ -34,9 +34,14 @@ export class AuthService {
 
   async login(user: any) {
     const payload = { sub: user.id };
+    const friendReq = await this.prisma.friendRequests.findMany({
+      where: {
+        receiver: user.id,
+      },
+    });
     return {
       access_token: this.jwtService.sign(payload),
-      user: user,
+      user: { ...user, friendReq: friendReq.length },
     };
   }
 }

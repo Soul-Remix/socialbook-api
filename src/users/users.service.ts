@@ -146,25 +146,28 @@ export class UsersService {
   async remove(id: number) {
     // search if there's a user with this id
     await this.validUser(id);
-    // delete any friends requests sent or received by the user
-    await this.prisma.friendRequests.deleteMany({
-      where: {
-        OR: [
-          {
-            sender: id,
-          },
-          {
-            receiver: id,
-          },
-        ],
-      },
-    });
-    // delete the user
-    await this.prisma.user.delete({
-      where: {
-        id,
-      },
-    });
+
+    await Promise.all([
+      // delete any friends requests sent or received by the user
+      this.prisma.friendRequests.deleteMany({
+        where: {
+          OR: [
+            {
+              sender: id,
+            },
+            {
+              receiver: id,
+            },
+          ],
+        },
+      }),
+      // delete the user
+      this.prisma.user.delete({
+        where: {
+          id,
+        },
+      }),
+    ]);
     return { message: 'User Deleted Successfully' };
   }
 

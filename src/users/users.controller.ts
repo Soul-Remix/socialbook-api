@@ -23,7 +23,6 @@ export class UsersController {
 
   // Create a user
   @Post()
-  @UseGuards(JwtAuthGuard)
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
