@@ -23,8 +23,14 @@ export class ConversationsController {
   }
 
   // Get All user Conversations
-  @Get(':id')
+  @Get('user/:id')
   findAllUserConversation(@Param('id') id: string) {
     return this.conversationsService.findAllUserConversation(+id);
+  }
+
+  // Find Conversation by Id
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.conversationsService.findOne(+id);
   }
 }

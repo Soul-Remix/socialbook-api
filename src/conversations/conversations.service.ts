@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 
@@ -34,9 +34,27 @@ export class ConversationsService {
       },
     });
     if (!user) {
-      throw new NotFoundException();
+      throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
     }
     const conversation = user.conversation;
     return { conv: conversation };
+  }
+
+  // Find Conversation by id
+  async findOne(id: number) {
+    const conv = await this.prisma.conversation.findUnique({
+      where: { id },
+      include: {
+        messages: {
+          orderBy: {
+            createdAt: 'desc',
+          },
+        },
+      },
+    });
+    if (!conv) {
+      throw new HttpException('Conversation Not Found', HttpStatus.NOT_FOUND);
+    }
+    return conv;
   }
 }

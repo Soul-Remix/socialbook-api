@@ -85,15 +85,19 @@ model Comment {
 }
 
 model Conversation {
-  id       Int       @id @default(autoincrement())
-  members  User[]
-  messages Message[]
+  id        Int       @id @default(autoincrement())
+  members   User[]
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@map("conversations")
 }
 
 model Message {
   id             Int           @id @default(autoincrement())
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
   text           String        @db.VarChar(255)
   senderId       Int
   receiverId     Int
