@@ -30,18 +30,21 @@ export class PostsController {
 
   // Update Post
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
     return this.postsService.update(+id, updatePostDto);
   }
 
   // Delete Post
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   remove(@Param('id') id: string) {
     return this.postsService.remove(+id);
   }
 
   // Get All Posts
   @Get()
+  @UseGuards(JwtAuthGuard)
   findAll(@Query('cursor') cursor?: number) {
     // change cursor type to number if it's string
     if (typeof cursor === 'string' && typeof cursor !== undefined) {
@@ -78,6 +81,7 @@ export class PostsController {
 
   // Find One Post
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.findOne(id);
   }
