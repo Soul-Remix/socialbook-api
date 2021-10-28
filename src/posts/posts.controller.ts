@@ -42,6 +42,20 @@ export class PostsController {
     return this.postsService.remove(+id);
   }
 
+  // add a Like to a Post
+  @Post(':id/likes')
+  @UseGuards(JwtAuthGuard)
+  addLike(@Request() req: any, @Param('id') id: string) {
+    return this.postsService.addLike(+id, req.user.id);
+  }
+
+  // remove a Like to a Post
+  @Delete(':id/likes')
+  @UseGuards(JwtAuthGuard)
+  removeLike(@Request() req: any, @Param('id') id: string) {
+    return this.postsService.removeLike(+id, req.user.id);
+  }
+
   // Get All Posts
   @Get()
   @UseGuards(JwtAuthGuard)

@@ -21,7 +21,7 @@ export class PostsService {
   // Update Post
   async update(id: number, data: UpdatePostDto) {
     // Check if there's a posts with this id
-    await this.CheckPostID(id);
+    await this.checkPostId(id);
     return this.prisma.post.update({
       where: {
         id,
@@ -29,13 +29,22 @@ export class PostsService {
       data: {
         ...data,
       },
+      select: {
+        author: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
     });
   }
 
   // Delete a post
   async remove(id: number) {
     // Check if there's a posts with this id
-    await this.CheckPostID(id);
+    await this.checkPostId(id);
     return this.prisma.post.delete({
       where: {
         id,
@@ -43,9 +52,52 @@ export class PostsService {
     });
   }
 
+  // Add a like to a post
+  async addLike(postId: number, userId: number) {
+    const post = await this.checkPostId(postId);
+    let alreadyLiked = post.Likes.includes(userId);
+    if (alreadyLiked) {
+      throw new HttpException(
+        'You already liked this post',
+        HttpStatus.CONFLICT,
+      );
+    }
+    await this.prisma.post.update({
+      where: {
+        id: postId,
+      },
+      data: {
+        Likes: { push: userId },
+      },
+    });
+    return { message: 'Post liked successfuly' };
+  }
+
+  // remove a like from a post
+  async removeLike(postId: number, userId: number) {
+    const post = await this.checkPostId(postId);
+    let alreadyLiked = post.Likes.includes(userId);
+    if (!alreadyLiked) {
+      throw new HttpException(
+        'You already removed your like from this post',
+        HttpStatus.CONFLICT,
+      );
+    }
+    const newLikes = post.Likes.filter((x) => x !== userId);
+    await this.prisma.post.update({
+      where: {
+        id: postId,
+      },
+      data: {
+        Likes: newLikes,
+      },
+    });
+    return { message: 'Removed like successfully' };
+  }
+
   // find a post by id
   async findOne(id: number) {
-    const post = await this.CheckPostID(id);
+    const post = await this.checkPostId(id);
     return post;
   }
 
@@ -57,6 +109,13 @@ export class PostsService {
       },
       include: {
         comments: true,
+        author: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
       },
     });
   }
@@ -75,6 +134,13 @@ export class PostsService {
         },
         include: {
           comments: true,
+          author: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
         },
       });
       // If cursor is Defined
@@ -90,6 +156,13 @@ export class PostsService {
         },
         include: {
           comments: true,
+          author: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
         },
       });
     }
@@ -132,6 +205,13 @@ export class PostsService {
         },
         include: {
           comments: true,
+          author: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
         },
       });
     } else {
@@ -158,6 +238,13 @@ export class PostsService {
         },
         include: {
           comments: true,
+          author: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
         },
       });
     }
@@ -179,18 +266,32 @@ export class PostsService {
       },
       include: {
         comments: true,
+        author: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
       },
     });
   }
 
   // Helper Func to check if there's a post with the provided id
-  async CheckPostID(id: number) {
+  async checkPostId(id: number) {
     const post = await this.prisma.post.findUnique({
       where: {
         id,
       },
       include: {
         comments: true,
+        author: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
       },
     });
     if (!post) {
