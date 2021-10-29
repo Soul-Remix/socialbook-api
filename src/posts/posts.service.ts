@@ -35,6 +35,7 @@ export class PostsService {
             id: true,
             firstName: true,
             lastName: true,
+            profilePicture: true,
           },
         },
       },
@@ -103,6 +104,12 @@ export class PostsService {
 
   // Get Personal Posts
   async findPersonal(id: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+    if (!user) {
+      throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
+    }
     return this.prisma.post.findMany({
       where: {
         authorId: id,
@@ -114,6 +121,7 @@ export class PostsService {
             id: true,
             firstName: true,
             lastName: true,
+            profilePicture: true,
           },
         },
       },
@@ -139,6 +147,7 @@ export class PostsService {
               id: true,
               firstName: true,
               lastName: true,
+              profilePicture: true,
             },
           },
         },
@@ -161,6 +170,7 @@ export class PostsService {
               id: true,
               firstName: true,
               lastName: true,
+              profilePicture: true,
             },
           },
         },
@@ -210,6 +220,7 @@ export class PostsService {
               id: true,
               firstName: true,
               lastName: true,
+              profilePicture: true,
             },
           },
         },
@@ -243,6 +254,7 @@ export class PostsService {
               id: true,
               firstName: true,
               lastName: true,
+              profilePicture: true,
             },
           },
         },
@@ -271,6 +283,7 @@ export class PostsService {
             id: true,
             firstName: true,
             lastName: true,
+            profilePicture: true,
           },
         },
       },
@@ -290,6 +303,7 @@ export class PostsService {
             id: true,
             firstName: true,
             lastName: true,
+            profilePicture: true,
           },
         },
       },

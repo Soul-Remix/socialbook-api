@@ -8,7 +8,10 @@ export class UpdateProfileDto {
   country?: string;
 
   @IsString()
-  city?: string;
+  livesIn?: string;
+
+  @IsString()
+  gender?: string;
 
   @IsDateString()
   birthDate?: string;

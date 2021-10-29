@@ -36,6 +36,38 @@ export class FriendsService {
     });
   }
 
+  async findFriendsOnline(id: number) {
+    // search for a user with the same id
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+      include: { friends: true },
+    });
+    // throw error if a user was not found
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    if (!user.friends) {
+      return [];
+    }
+    // return the friends list
+    return this.prisma.user.findMany({
+      where: {
+        id: {
+          in: user.friends.friends,
+        },
+        isOnline: true,
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        profilePicture: true,
+      },
+    });
+  }
+
   async findRequests(id: number) {
     return this.prisma.friendRequests.findMany({
       where: {

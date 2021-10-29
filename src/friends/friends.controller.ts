@@ -23,6 +23,12 @@ export class FriendsController {
     return this.friendsService.findFriends(+id);
   }
 
+  @Get(':id/online')
+  @UseGuards(JwtAuthGuard)
+  findFriendsOnline(@Param('id') id: string) {
+    return this.friendsService.findFriendsOnline(+id);
+  }
+
   @Get()
   // Return a list off friends requests received by the user
   @UseGuards(JwtAuthGuard)
@@ -44,6 +50,7 @@ export class FriendsController {
     return this.friendsService.acceptFriendRequest(+id);
   }
 
+  // Decline friend request
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   declineFriendRequest(@Param('id') id: string) {

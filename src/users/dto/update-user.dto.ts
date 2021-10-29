@@ -3,6 +3,7 @@ import {
   IsEmail,
   IsNotEmpty,
   IsString,
+  IsUrl,
   MinLength,
 } from 'class-validator';
 
@@ -17,6 +18,9 @@ export class UpdateUserDto {
   @IsString()
   @IsAlpha()
   lastName: string;
+
+  @IsUrl()
+  profilePicture: string;
 
   @IsString()
   @IsNotEmpty()

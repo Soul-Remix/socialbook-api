@@ -14,6 +14,7 @@ model User {
   lastName        String           @db.VarChar(30)
   profilePicture  String           @default("/image")
   password        String
+  isOnline        Boolean          @default(false)
   role            Role             @default(USER)
   extendedProfile ExtendedProfile?
   posts           Post[]
@@ -30,8 +31,9 @@ model ExtendedProfile {
   updatedAt DateTime @updatedAt
   bio       String?
   country   String?
-  city      String?
   birthDate String?
+  livesIn   String?
+  gender    String?  @default("other")
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int      @unique
 

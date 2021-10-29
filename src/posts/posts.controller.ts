@@ -68,10 +68,10 @@ export class PostsController {
   }
 
   // Get User Posts
-  @Get('personal')
+  @Get('personal/:id')
   @UseGuards(JwtAuthGuard)
-  findPersonal(@Request() req: any) {
-    return this.postsService.findPersonal(req.user.id);
+  findPersonal(@Param('id') id: string) {
+    return this.postsService.findPersonal(+id);
   }
 
   // Get feed posts
