@@ -27,4 +27,6 @@ export class CreateUserDto {
   @MinLength(6)
   @IsDefined()
   password: string;
+
+  createdAt: string;
 }

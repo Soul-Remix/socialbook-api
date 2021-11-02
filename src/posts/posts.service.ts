@@ -4,6 +4,18 @@ import { PrismaService } from '../prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 
+const include = {
+  comments: true,
+  author: {
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      profilePicture: true,
+    },
+  },
+};
+
 @Injectable()
 export class PostsService {
   constructor(private readonly prisma: PrismaService) {}
@@ -15,6 +27,7 @@ export class PostsService {
         ...data,
         author: { connect: { id } },
       },
+      include: include,
     });
   }
 
@@ -29,16 +42,7 @@ export class PostsService {
       data: {
         ...data,
       },
-      select: {
-        author: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            profilePicture: true,
-          },
-        },
-      },
+      include: include,
     });
   }
 
@@ -114,17 +118,10 @@ export class PostsService {
       where: {
         authorId: id,
       },
-      include: {
-        comments: true,
-        author: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            profilePicture: true,
-          },
-        },
+      orderBy: {
+        createdAt: 'desc',
       },
+      include: include,
     });
   }
 
@@ -140,17 +137,7 @@ export class PostsService {
         orderBy: {
           createdAt: 'desc',
         },
-        include: {
-          comments: true,
-          author: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              profilePicture: true,
-            },
-          },
-        },
+        include: include,
       });
       // If cursor is Defined
     } else {
@@ -163,17 +150,7 @@ export class PostsService {
         orderBy: {
           createdAt: 'desc',
         },
-        include: {
-          comments: true,
-          author: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              profilePicture: true,
-            },
-          },
-        },
+        include: include,
       });
     }
     // Check if there's more Posts
@@ -213,17 +190,7 @@ export class PostsService {
         orderBy: {
           createdAt: 'desc',
         },
-        include: {
-          comments: true,
-          author: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              profilePicture: true,
-            },
-          },
-        },
+        include: include,
       });
     } else {
       posts = await this.prisma.post.findMany({
@@ -247,17 +214,7 @@ export class PostsService {
         orderBy: {
           createdAt: 'desc',
         },
-        include: {
-          comments: true,
-          author: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              profilePicture: true,
-            },
-          },
-        },
+        include: include,
       });
     }
     if (posts && posts.length === 10) {
@@ -276,17 +233,7 @@ export class PostsService {
           mode: 'insensitive',
         },
       },
-      include: {
-        comments: true,
-        author: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            profilePicture: true,
-          },
-        },
-      },
+      include: include,
     });
   }
 
@@ -296,17 +243,7 @@ export class PostsService {
       where: {
         id,
       },
-      include: {
-        comments: true,
-        author: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            profilePicture: true,
-          },
-        },
-      },
+      include: include,
     });
     if (!post) {
       throw new HttpException('Post not found', HttpStatus.NOT_FOUND);

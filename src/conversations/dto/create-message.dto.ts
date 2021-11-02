@@ -8,8 +8,4 @@ export class CreateMessageDto {
   @IsDefined()
   @IsNumber()
   conversationId: number;
-
-  @IsDefined()
-  @IsNumber()
-  receiverId: number;
 }

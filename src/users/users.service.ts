@@ -53,7 +53,7 @@ export class UsersService {
     // If cursor is not defined
     if (cursor === undefined) {
       users = await this.prisma.user.findMany({
-        take: 20,
+        take: 40,
         orderBy: {
           extendedProfile: {
             createdAt: 'desc',
@@ -63,7 +63,7 @@ export class UsersService {
       // If cursor is Defined
     } else {
       users = await this.prisma.user.findMany({
-        take: 20,
+        take: 40,
         skip: 1,
         cursor: {
           id: cursor,
@@ -76,8 +76,8 @@ export class UsersService {
       });
     }
     // Check if there's more users
-    if (users && users.length === 20) {
-      nextCursor = users[19].id;
+    if (users && users.length === 40) {
+      nextCursor = users[39].id;
       hasNextPage = true;
     }
     return { users, hasNextPage, nextCursor };

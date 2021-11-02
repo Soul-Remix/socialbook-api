@@ -13,7 +13,6 @@ export class ConversationsService {
       data: {
         text: data.text,
         senderId,
-        receiverId: data.receiverId,
         Conversation: { connect: { id: data.conversationId } },
       },
     });
@@ -27,7 +26,13 @@ export class ConversationsService {
         conversation: {
           include: {
             members: {
-              select: { id: true },
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                profilePicture: true,
+                isOnline: true,
+              },
             },
           },
         },
@@ -37,7 +42,7 @@ export class ConversationsService {
       throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
     }
     const conversation = user.conversation;
-    return { conv: conversation };
+    return conversation;
   }
 
   // Find Conversation by id
@@ -47,7 +52,7 @@ export class ConversationsService {
       include: {
         messages: {
           orderBy: {
-            createdAt: 'desc',
+            createdAt: 'asc',
           },
         },
       },
