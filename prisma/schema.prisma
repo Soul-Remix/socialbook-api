@@ -17,6 +17,7 @@ model User {
   profilePicture  String           @default("/image")
   password        String
   isOnline        Boolean          @default(false)
+  sId             String?          @unique
   role            Role             @default(USER)
   extendedProfile ExtendedProfile?
   posts           Post[]

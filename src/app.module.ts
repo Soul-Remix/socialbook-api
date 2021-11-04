@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { PostsModule } from './posts/posts.module';
 import { CommentsModule } from './comments/comments.module';
 import { ConversationsModule } from './conversations/conversations.module';
+import { SocketModule } from './socket/socket.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ConversationsModule } from './conversations/conversations.module';
     PostsModule,
     CommentsModule,
     ConversationsModule,
+    SocketModule,
   ],
   controllers: [],
   providers: [],

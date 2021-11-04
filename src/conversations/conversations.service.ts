@@ -32,6 +32,7 @@ export class ConversationsService {
                 lastName: true,
                 profilePicture: true,
                 isOnline: true,
+                sId: true,
               },
             },
           },
