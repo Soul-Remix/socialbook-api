@@ -32,7 +32,7 @@ export class UsersService {
       data: {
         firstName,
         lastName,
-        email,
+        email: email.trim().toLowerCase(),
         password: hash,
         extendedProfile: {
           create: {},
