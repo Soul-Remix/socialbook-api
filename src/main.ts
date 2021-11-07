@@ -5,6 +5,7 @@ import * as helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({
       skipUndefinedProperties: true,
@@ -13,7 +14,6 @@ async function bootstrap() {
   );
   app.enableCors();
   app.use(helmet());
-  app.enableVersioning();
   await app.listen(8000);
 }
 bootstrap();
