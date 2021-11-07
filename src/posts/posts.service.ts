@@ -102,7 +102,36 @@ export class PostsService {
 
   // find a post by id
   async findOne(id: number) {
-    const post = await this.checkPostId(id);
+    const post = await this.prisma.post.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        comments: {
+          include: {
+            User: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                profilePicture: true,
+              },
+            },
+          },
+        },
+        author: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            profilePicture: true,
+          },
+        },
+      },
+    });
+    if (!post) {
+      throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
+    }
     return post;
   }
 

@@ -14,6 +14,16 @@ export class CommentsService {
         userId,
         postId: createCommentDto.postId,
       },
+      include: {
+        User: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            profilePicture: true,
+          },
+        },
+      },
     });
   }
 
