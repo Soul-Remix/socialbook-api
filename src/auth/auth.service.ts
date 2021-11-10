@@ -37,6 +37,7 @@ export class AuthService {
     const friendReq = await this.prisma.friendRequests.findMany({
       where: {
         receiver: user.id,
+        accepted: false,
       },
     });
     return {

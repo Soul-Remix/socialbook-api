@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Query,
+  Request,
 } from '@nestjs/common';
 
 import { UsersService } from './users.service';
@@ -16,6 +17,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { SearchUsersDto } from './dto/search-user.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { updatePassDto } from './dto/update-pass.dto';
 
 @Controller('users')
 export class UsersController {
@@ -49,6 +51,16 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
+  }
+
+  @Patch(':id/pass')
+  @UseGuards(JwtAuthGuard)
+  updatePass(
+    @Param('id') id: string,
+    @Body() updatePassDto: updatePassDto,
+    @Request() req: any,
+  ) {
+    return this.usersService.updatePass(+id, updatePassDto, req.user);
   }
 
   // Update a user profile

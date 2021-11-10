@@ -1,11 +1,4 @@
-import {
-  IsAlpha,
-  IsEmail,
-  IsNotEmpty,
-  IsString,
-  IsUrl,
-  MinLength,
-} from 'class-validator';
+import { IsAlpha, IsEmail, IsString, IsUrl } from 'class-validator';
 
 export class UpdateUserDto {
   @IsEmail()
@@ -21,9 +14,4 @@ export class UpdateUserDto {
 
   @IsUrl()
   profilePicture: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(6)
-  password: string;
 }

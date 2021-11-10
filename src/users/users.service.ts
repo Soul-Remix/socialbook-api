@@ -3,6 +3,7 @@ import * as bcrypt from 'bcrypt';
 
 import { PrismaService } from '../prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { updatePassDto } from './dto/update-pass.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -104,10 +105,6 @@ export class UsersService {
   async update(id: number, updateUserDto: UpdateUserDto) {
     // search if there's a user with this id
     await this.validUser(id);
-    if (updateUserDto.password) {
-      const hash = await bcrypt.hash(updateUserDto.password, 12);
-      updateUserDto.password = hash;
-    }
     // update the user
     const user = await this.prisma.user.update({
       where: {
@@ -120,6 +117,38 @@ export class UsersService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...result } = user;
     return result;
+  }
+
+  async updatePass(id: number, updatePassDto: updatePassDto, user: any) {
+    if (user.role === 'USER' && user.id !== id) {
+      throw new HttpException('Not allowed', HttpStatus.METHOD_NOT_ALLOWED);
+    }
+    if (updatePassDto.newPass !== updatePassDto.ConfPass) {
+      throw new HttpException(
+        "Passwords Don't match",
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+    }
+    const validPass = await bcrypt.compare(
+      updatePassDto.oldPass,
+      user.password,
+    );
+    if (!validPass) {
+      throw new HttpException(
+        "Passwords Don't match",
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+    }
+    const newPass = await bcrypt.hash(updatePassDto.newPass, 12);
+    await this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        password: newPass,
+      },
+    });
+    return { message: 'Password Updated Successfully' };
   }
 
   async updateProfile(id: number, data: UpdateProfileDto) {
